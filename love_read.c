@@ -1,0 +1,130 @@
+#include "cs50.h"
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 100 // 最多图书册数
+typedef struct
+{
+    int id;         // 书号
+    char title[50]; // 书名
+    bool borrowed;  // 是否借出
+} Book;
+
+Book lib[MAX];
+int count = 0; // 当前册数
+
+void add(void)
+{ // 自定义函数：添加
+    if (count == MAX)
+    {
+        printf("库满，无法新增。\n");
+        return;
+    }
+    lib[count].id = get_int("书号: ");
+    printf("书名: ");
+    scanf("%64s", lib[count].title);
+    lib[count].borrowed = false;
+    count++;
+    printf("已添加。\n");
+}
+void del(void)
+{ // 自定义函数：删除
+    int id = get_int("要删的书号: ");
+    for (int i = 0; i < count; i++)
+        if (lib[i].id == id)
+        {
+            lib[i] = lib[--count]; // 用最后一本覆盖
+            printf("已删除。\n");
+            return;
+        }
+    printf("未找到该书号。\n");
+}
+void query(void)
+{ // 自定义函数：查询
+    int id = get_int("查询书号: ");
+    for (int i = 0; i < count; i++)
+        if (lib[i].id == id)
+        {
+            printf("《%s》 借出状态: %s\n", lib[i].title,
+                   lib[i].borrowed ? "已借出" : "在馆");
+            return;
+        }
+    printf("未找到。\n");
+}
+void list(void)
+{ // 自定义函数：列出全部书籍
+    puts("-----------图书列表-----------");
+    for (int i = 0; i < count; i++)
+        printf("%d\t《%s》\t%s\n", lib[i].id, lib[i].title,
+               lib[i].borrowed ? "已借出" : "在馆");
+}
+void borrow(void)
+{ // 自定义函数：借书
+    int id = get_int("借书书号: ");
+    for (int i = 0; i < count; i++)
+        if (lib[i].id == id)
+        {
+            if (lib[i].borrowed)
+                printf("已被借走。\n");
+            else
+            {
+                lib[i].borrowed = true;
+                printf("借书成功。\n");
+            }
+            return;
+        }
+    printf("书号不存在。\n");
+}
+void Return(void)
+{ // 自定义函数：还书
+    int id = get_int("还书书号: ");
+    for (int i = 0; i < count; i++)
+        if (lib[i].id == id)
+        {
+            if (!lib[i].borrowed)
+                printf("本书未借出。\n");
+            else
+            {
+                lib[i].borrowed = false;
+                printf("还书成功。\n");
+            }
+            return;
+        }
+    printf("书号不存在。\n");
+}
+
+int main(void)
+{
+    while (true)
+    {
+        puts("\n====== 小乐子图书馆 ======");
+        puts("1 新增  2 删除  3 查询  4 列表  5 借书  6 还书  0 退出");
+        int op = get_int("选择: ");
+        switch (op)
+        {
+        case 1:
+            add();
+            break; // 和上面一一对应
+        case 2:
+            del();
+            break;
+        case 3:
+            query();
+            break;
+        case 4:
+            list();
+            break;
+        case 5:
+            borrow();
+            break;
+        case 6:
+            Return();
+            break;
+        case 0:
+            puts("欢迎下次再来~");
+            return 0;
+        default:
+            puts("请输入 0-6，谢谢");
+        }
+    }
+}
